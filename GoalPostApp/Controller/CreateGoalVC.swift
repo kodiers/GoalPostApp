@@ -8,17 +8,23 @@
 
 import UIKit
 
-class CreateGoalVC: UIViewController {
+class CreateGoalVC: UIViewController, UITextViewDelegate {
 
     @IBOutlet weak var goalTextView: UITextView!
     @IBOutlet weak var shortTermBtn: UIButton!
     @IBOutlet weak var longTermBtn: UIButton!
     @IBOutlet weak var nextBtn: UIButton!
     
+    var goalType: GoalType = .shortTerm
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
+        goalTextView.delegate = self
+        nextBtn.bindToKeyboard()
+        shortTermBtn.setSelectedColor()
+        longTermBtn.setDeselectedColor()
     }
 
     override func didReceiveMemoryWarning() {
@@ -36,16 +42,33 @@ class CreateGoalVC: UIViewController {
         // Pass the selected object to the new view controller.
     }
     */
+    
+    func textViewDidBeginEditing(_ textView: UITextView) {
+        goalTextView.text = ""
+        goalTextView.textColor = #colorLiteral(red: 0, green: 0, blue: 0, alpha: 1)
+    }
+    
     @IBAction func nextBtnPressed(_ sender: Any) {
+        if goalTextView.text != "" && goalTextView.text != "What is your goal?" {
+            guard let finishGoalVC = storyboard?.instantiateViewController(withIdentifier: "FinishGoalVC") as? FinishGoalVC else { return }
+            finishGoalVC.initData(description: goalTextView.text, type: goalType)
+            presenrDetail(finishGoalVC)
+        }
     }
     
     @IBAction func shortTermPressed(_ sender: Any) {
+        goalType = .shortTerm
+        shortTermBtn.setSelectedColor()
+        longTermBtn.setDeselectedColor()
     }
     
     @IBAction func longTermPressed(_ sender: Any) {
+        goalType = .longTerm
+        longTermBtn.setSelectedColor()
+        shortTermBtn.setDeselectedColor()
     }
     
     @IBAction func backPressed(_ sender: Any) {
-        dismiss(animated: true, completion: nil)
+        dismissDetail()
     }
 }
